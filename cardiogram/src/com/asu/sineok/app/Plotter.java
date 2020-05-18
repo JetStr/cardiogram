@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Plotter {
 
@@ -19,8 +20,9 @@ public class Plotter {
         final List<XChartPanel<Chart>> chartPanels = new ArrayList();
         double[] yData = FileService.getValues(new File("base.txt"));
         double[] xData = new double[yData.length];
-        double multiplier;
+        double multiplier = 1;
         double h = 1 / (double) xData.length;
+        Random random = new Random();
         if (mult != null && !"".equals(mult)) {
             mult = mult.replace(",", ".");
             multiplier = Double.parseDouble(mult);
@@ -49,10 +51,18 @@ public class Plotter {
         }
         for (int i = 0; i < xData.length; i++) {
             xData[i] = h * i;
+            yData[i] += random.nextDouble() * 0.1 - 0.5;
         }
 
         // Create Chart
-        XYChart chart = QuickChart.getChart("", "X", "Y", "y(x)", xData, yData);
+        XYChart chart = QuickChart.getChart("",
+                "X",
+                "Y - значение сгинала",
+                "Множитель: " + multiplier + "\n" +
+                        "Частота дискретизации: " + (freq != null && !freq.isEmpty() ? freq : 600) + "\n" +
+                        "Время моделирования, с: " + (seconds != null && !seconds.isEmpty() ? seconds : 1),
+                xData,
+                yData);
 
         // Show it
         final JFrame frame = new JFrame("Cardio");
